@@ -1,0 +1,13 @@
+{% extends "sorties/base.html" %}
+
+{% block title %}Supprimer la Sortie{% endblock %}
+
+{% block content %}
+    <h2>Supprimer la Sortie</h2>
+    <p>Êtes-vous sûr de vouloir supprimer cette sortie : "{{ sortie.nom }}" ?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Supprimer</button>
+        <a href="{% url 'groupe_detail' sortie.groupe.id %}" class="btn btn-secondary">Annuler</a>
+    </form>
+{% endblock %}

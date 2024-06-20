@@ -1,0 +1,186 @@
+{% extends "sorties/base.html" %}
+
+{% block title %}Liste des Groupes{% endblock %}
+
+{% block content %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #345c33;
+        }
+        h1 {
+            color: #345c33;
+            text-align: center;
+            border-bottom: 2px solid #345c33;
+            padding-bottom: 10px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        li {
+            background-color: #fff;
+            border: 2px solid #345c33;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+            width: 300px;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            transition: box-shadow 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        li:hover {
+            box-shadow: 0 4px 8px #345c33;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+
+        }
+        a {
+            text-decoration: none;
+            color: #3498db;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        a:hover {
+            text-decoration: underline;
+            color: #2c3e50;
+        }
+        .groupe-details {
+            font-size: 14px;
+            color: #555;
+            text-align: left;
+            width: 100%;
+        }
+        .groupe-details p {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .participants-box {
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            padding: 10px;
+            width: 100%;
+            text-align: left;
+            overflow: hidden;
+        }
+        .participant-name {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .participant-name:last-child {
+            border-bottom: none;
+        }
+        .toggle-arrow {
+            cursor: pointer;
+            text-align: center;
+            display: block;
+            margin: 10px auto;
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+        .collapsed .toggle-arrow {
+            transform: rotate(180deg);
+        }
+        .collapsed .participant-name:nth-child(n+2) {
+            display: none;
+        }
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .search-container input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #345c33;
+            border-radius: 5px;
+            width: 300px;
+        }
+    </style>
+    
+    <h1>Groupes</h1>
+    
+    <!-- Barre de recherche -->
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Rechercher un groupe...">
+    </div>
+    
+    <ul id="group-list">
+        {% for groupe in groupes %}
+            <li class="group-item">
+                <a style="color:green;" href="{% url 'groupe_detail' group_id=groupe.id %}">{{ groupe.nom }}</a>
+                <div class="groupe-details">
+                    <p>Membres du groupe</p>
+                    <div class="participants-box collapsed">
+                        {% for participant in groupe.membres.all %}
+                            <div class="participant-name">{{ participant.username }}
+                                {% if participant == groupe.administrateur %}
+                                    <span class="admin-crown">👑</span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <span class="toggle-arrow">&#9660;</span>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const groupList = document.getElementById('group-list');
+            const groups = groupList.getElementsByClassName('group-item');
+
+            searchInput.addEventListener('keyup', function() {
+                const query = searchInput.value.toLowerCase();
+                for (let group of groups) {
+                    const groupName = group.querySelector('a').textContent.toLowerCase();
+                    if (groupName.includes(query)) {
+                        group.style.display = '';
+                    } else {
+                        group.style.display = 'none';
+                    }
+                }
+            });
+
+            document.querySelectorAll('.toggle-arrow').forEach(function(arrow) {
+                arrow.addEventListener('click', function() {
+                    const participantsBox = arrow.previousElementSibling;
+                    participantsBox.classList.toggle('collapsed');
+                    arrow.classList.toggle('flipped');
+                });
+    
+                arrow.addEventListener('mouseenter', function() {
+                    const participantsBox = arrow.previousElementSibling;
+                    const isCollapsed = participantsBox.classList.contains('collapsed');
+    
+                    if (!isCollapsed) {
+                        arrow.classList.add('flipped');
+                    }
+                });
+    
+                arrow.addEventListener('mouseleave', function() {
+                    arrow.classList.remove('flipped');
+                });
+            });
+        });
+    </script>
+    
+    <style>
+        .flipped {
+            transform: rotate(180deg);
+        }
+    </style>
+{% endblock %}

@@ -1,0 +1,279 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Titre{% endblock %}</title>
+    <link rel="icon" href="{% static 'images/logo.png' %}">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            background-color: #f5f8fa;
+            
+        }
+        
+        .sidebar {
+            width: 25%;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: fixed;
+            overflow-y: auto;
+            transition: width 0.3s;
+            border-right: 1px solid #ccc;
+            padding-top: 10px;
+            height: 100%;
+            padding-bottom: 20px;
+            
+        }
+        
+        .button_sidebar {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            margin: 5px 20px;
+            text-decoration: none;
+            color: #000;
+            border-radius: 30px;
+            transition: box-shadow 0.3s, background-color 0.3s;
+            width: auto;
+            font-weight: bold;
+           
+        }
+        
+        .button_sidebar:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #f0f0f0;
+            color: #000;
+        }
+        
+        .button_sidebar .icon {
+            margin-right: 15px;
+        }
+        
+        .button_sidebar .text {
+            display: inline;
+            margin-left: 5px;
+           
+        }
+
+        .profile-photo {
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            object-fit: cover; /* This property ensures the image maintains its aspect ratio */
+            margin-right: 15px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 10px 2px;
+            margin: 5px 20px 0;
+            text-decoration: none;
+        }
+
+       
+
+        .logo img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            transition: box-shadow 0.3s, background-color 0.3s;
+            border-radius: 30px;
+        }
+        
+        .logo:hover img {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #f0f0f0;
+        }
+
+        .content {
+            margin-left: 25%;
+            padding: 20px;
+            width: 75%;
+            transition: margin-left 0.3s, width 0.3s;
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 10px;
+            
+        }
+        
+        .button_deco {
+            background-color: #427641;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-radius 0.3s, box-shadow 0.3s, background-color 0.3s;
+            width: 90%;
+            max-width: 200px;
+            text-decoration: none;
+            
+        }
+        .button {
+            background-color: #427641;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-radius 0.3s, box-shadow 0.3s, background-color 0.3s;
+            width: 90%;
+            max-width: 2000px;
+            text-decoration: none;
+        }
+        
+        .button:hover, .button_deco:hover {
+            background-color: #365a32;
+            color: #ffffff;
+        }
+
+        .button_deco .icon, .button_deco .text {
+            margin-right: 15px;
+        }
+        
+        .button_deco-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 90%;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                align-items: center;
+            }
+            .sidebar a {
+                justify-content: center;
+                width: 100%;
+                margin: 10px 0;
+            }
+            .sidebar a .text {
+                display: none;
+            }
+            .content {
+                margin-left: 80px;
+                width: calc(100% - 80px);
+            }
+            .button, .button_deco {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                padding: 0;
+                max-width: none;
+            }
+            .button svg, .button_deco svg {
+                display: block;
+                margin: 0;
+            }
+            .button span, .button_deco span {
+                display: none;
+            }
+            .button:hover, .button_deco:hover {
+                box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+            }
+            .button_deco-container {
+                left: 10px;
+                right: 10px;
+                width: auto;
+                bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="{% url 'liste_groupes' %}" class="logo">
+            <img src="{% static 'images/logo1.png' %}" alt="Logo">
+        </a>
+        <a href="{% url 'liste_groupes' %}" class="button_sidebar">
+            <svg class="icon" viewBox="0 0 640 512" fill="currentColor" width="30" height="30">
+                <path d="M261.56 101.28a8 8 0 00-11.06 0L66.4 277.15a8 8 0 00-2.47 5.79L63.9 448a32 32 0 0032 32H192a16 16 0 0016-16V328a8 8 0 018-8h80a8 8 0 018 8v136a16 16 0 0016 16h96.06a32 32 0 0032-32V282.94a8 8 0 00-2.47-5.79z"/>
+                <path d="M490.91 244.15l-74.8-71.56V64a16 16 0 00-16-16h-48a16 16 0 00-16 16v32l-57.92-55.38C272.77 35.14 264.71 32 256 32c-8.68 0-16.72 3.14-22.14 8.63l-212.7 203.5c-6.22 6-7 15.87-1.34 22.37A16 16 0 0043 267.56L250.5 69.28a8 8 0 0111.06 0l207.52 198.28a16 16 0 0022.59-.44c6.14-6.36 5.63-16.86-.76-22.97z"/>
+            </svg>
+            <span class="text">Home</span>
+        </a>
+        <a href="{% url 'search_users' %}" class="button_sidebar">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                <path d="M10.25 3.75c-3.59 0-6.5 2.91-6.5 6.5s2.91 6.5 6.5 6.5c1.795 0 3.419-.726 4.596-1.904 1.178-1.177 1.904-2.801 1.904-4.596 0-3.59-2.91-6.5-6.5-6.5zm-8.5 6.5c0-4.694 3.806-8.5 8.5-8.5s8.5 3.806 8.5 8.5c0 1.986-.682 3.815-1.824 5.262l4.781 4.781-1.414 1.414-4.781-4.781c-1.447 1.142-3.276 1.824-5.262 1.824-4.694 0-8.5-3.806-8.5-8.5z"></path>
+            </svg>
+            <span class="text">Rechercher</span>
+        </a>
+        <a href="{% url 'view_friends' %}" class="button_sidebar">
+            <svg class="icon" viewBox="0 0 640 512" fill="currentColor" width="30" height="30">
+                <path d="M402 168c-2.93 40.67-33.1 72-66 72s-63.12-31.32-66-72c-3-42.31 26.37-72 66-72s69 30.46 66 72z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                <path d="M336 304c-65.17 0-127.84 32.37-143.54 95.41-2.08 8.34 3.15 16.59 11.72 16.59h263.65c8.57 0 13.77-8.25 11.72-16.59C463.85 335.36 401.18 304 336 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                <path d="M200 185.94c-2.34 32.48-26.72 58.06-53 58.06s-50.7-25.57-53-58.06C91.61 152.15 115.34 128 147 128s55.39 24.77 53 57.94z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                <path d="M206 306c-18.05-8.27-37.93-11.45-59-11.45-52 0-102.1 25.85-114.65 76.2-1.65 6.66 2.53 13.25 9.37 13.25H154" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32"/>
+            </svg>
+            <span class="text">Mes Amis</span>
+        </a>
+        <a href="{% url 'mes_evenements' %}" class="button_sidebar">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="30" height="30">
+                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-1.99.9-1.99 2L3 21c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H5V8h14v13zM7 10h5v5H7z"></path>
+            </svg>
+            <span class="text">Mes Événements</span>
+        </a>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'view_profile' request.user.username %}" class="button_sidebar">
+                {% if user.profile.photo %}
+                    <img src="{{ user.profile.photo.url }}" alt="Profile Photo" class="profile-photo">
+                {% else %}
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                        <path d="M20.7 7.3l-4-4a1 1 0 00-1.4 0l-9 9a1 1 0 00-.3.7v3a1 1 0 001 1h3a1 1 0 00.7-.3l9-9a1 1 0 000-1.4zM4 20h16a1 1 0 000-2H4a1 1 0 000 2zm7-7.6l5.6-5.6L16 4.4l-5.6 5.6L11 13v-1.6z"></path>
+                    </svg>
+                {% endif %}
+                <span class="text">Profil</span>
+            </a>
+            <div class="button-container">
+                <a href="{% url 'creer_groupe' %}" class="button">
+                    <svg viewBox="0 0 640 512" fill="currentColor" width="24" height="24">
+                      <path d="M256 448c141.4 0 256-93.1 256-208S397.4 32 256 32S0 125.1 0 240c0 45.1 17.7 86.8 47.7 120.9c-1.9 24.5-11.4 46.3-21.4 62.9c-5.5 9.2-11.1 16.6-15.2 21.6c-2.1 2.5-3.7 4.4-4.9 5.7c-.6 .6-1 1.1-1.3 1.4l-.3 .3 0 0 0 0 0 0 0 0c-4.6 4.6-5.9 11.4-3.4 17.4c2.5 6 8.3 9.9 14.8 9.9c28.7 0 57.6-8.9 81.6-19.3c22.9-10 42.4-21.9 54.3-30.6c31.8 11.5 67 17.9 104.1 17.9zM224 160c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v48h48c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H288v48c0 8.8-7.2 16-16 16H240c-8.8 0-16-7.2-16-16V272H176c-8.8 0-16-7.2-16-16V224c0-8.8 7.2-16 16-16h48V160z"/>
+                    </svg>
+                    <span>Créer un groupe</span>
+                </a>
+            </div>
+            <div class="button_deco-container">
+                <a href="{% url 'logout' %}" class="button_deco">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                        <path d="M16 13v-2H7.83l3.58-3.59L10 6l-6 6 6 6 1.41-1.41L7.83 13H16zm4 8H4v-2h16v2z"></path>
+                    </svg>
+                    <span>Déconnexion</span>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    <div class="content">
+        <div class="container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</body>
+</html>

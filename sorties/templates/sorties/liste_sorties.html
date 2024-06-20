@@ -1,0 +1,79 @@
+{% extends "sorties/base.html" %}
+
+{% block title %}Liste des Sorties Proposées{% endblock %}
+
+{% block content %}
+    <h1>Liste des Sorties Proposées</h1>
+    <style>
+        .sortie-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sortie-list li {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: box-shadow 0.3s;
+        }
+
+        .sortie-list li:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .sortie-list li .sortie-name {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .sortie-list li .sortie-date {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .button {
+            background-color: #427641;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-radius 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .button:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #345c33;
+            color: white; /* Ensure the text color remains white */
+            text-decoration: none;
+        }
+
+        .button svg {
+            display: none;
+        }
+
+        .sortie-header {
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <div class="sortie-header">
+        <a href="{% url 'creer_sortie' groupe.id %}" class="button">Proposer une nouvelle sortie</a>
+    </div>
+    <ul class="sortie-list">
+        {% for sortie in sorties %}
+            <li>
+                <div class="sortie-name">{{ sortie.nom }}</div>
+                <div class="sortie-date">{{ sortie.date }}</div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

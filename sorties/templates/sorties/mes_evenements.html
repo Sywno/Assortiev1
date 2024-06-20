@@ -1,0 +1,361 @@
+{% extends "sorties/base.html" %}
+
+{% block title %}Mes Événements{% endblock %}
+
+{% block content %}
+    <!-- Inclure les styles et scripts pour Leaflet et FullCalendar -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+    
+    <style>
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            padding: 10px 20px;
+            flex: 1;
+            font-weight: bold;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab:hover {
+            color: #345c33;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid #345c33;
+            color: #345c33;
+        }
+
+        .list-group {
+            padding: 0;
+            list-style: none;
+        }
+
+        .list-group-item {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px;
+            border-bottom: 1px solid #ccc;
+            transition: background-color 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .list-group-item:hover {
+            background-color: #f0f0f0;
+            border: 2px solid green;
+            border-radius: 10px;
+        }
+
+        .event-details {
+            max-width: 60%;
+            margin-right: 20px;
+        }
+
+        .event-name {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .event-status {
+            font-weight: bold;
+            color: green;
+        }
+
+        .event-status.not-participating {
+            color: red;
+        }
+
+        .toggle-participation {
+            margin-top: 10px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .toggle-participation:hover {
+            color: #345c33;
+        }
+
+        .map-container {
+            width: 35%;
+            height: 200px;
+            margin-top: 2px;
+        }
+
+        #calendar {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        button {
+            color: #FFF;
+            background-color: #0F7512;
+            font-size: 18px;
+            text-align: center;
+            font-style: normal;
+            border-radius: 5px;
+            width: 100%;
+            border: 1px solid #0F4912;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            color: #FFF;
+            background-color: #0F4912;
+            font-size: 18px;
+            text-align: center;
+            font-style: normal;
+            border-radius: 5px;
+            width: 100%;
+            border: 1px solid #0F4912;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .export-ical {
+            margin-top: 20px;
+        }
+    </style>
+
+    <div class="tabs">
+        <div class="tab active" id="tab-list">Mes Événements</div>
+        <div class="tab" id="tab-calendar">Calendrier</div>
+        <div class="tab" id="tab-history">Historique</div>
+    </div>
+
+    <div id="content-list" class="tab-content active">
+        <h2>Mes Événements</h2>
+        <ul class="list-group">
+            {% for event in all_events %}
+                <li class="list-group-item">
+                    <div class="event-details">
+                        <span class="event-name">{{ event.nom }}</span>
+                        <div>
+                            <span>Date: {{ event.date }}</span><br>
+                            <span>Lieu: {{ event.lieu }}</span><br>
+                            <span>Groupe: {{ event.groupe.nom }}</span>
+                        </div>
+                        {% if event.id in participation_status %}
+                            <span class="event-status">Je participe</span>
+                            <form method="post" action="{% url 'toggle_participation' event.id %}" class="toggle-participation">
+                                {% csrf_token %}
+                                <button type="submit">Annuler participation</button>
+                            </form>
+                        {% else %}
+                            <span class="event-status not-participating">Je ne participe pas</span>
+                            <form method="post" action="{% url 'toggle_participation' event.id %}" class="toggle-participation">
+                                {% csrf_token %}
+                                <button type="submit">Participer</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    <div id="map-{{ forloop.counter }}" class="map-container"></div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div id="content-calendar" class="tab-content">
+        <h2>Calendrier des Événements</h2>
+        <div id="calendar"></div>
+        <button id="export-ical">Exporter le Calendrier</button>
+    </div>
+
+    <div id="content-history" class="tab-content">
+        <h2>Historique des Événements</h2>
+        <ul class="list-group">
+            {% for event in past_events %}
+                <li class="list-group-item">
+                    <div class="event-details">
+                        <span class="event-name">{{ event.nom }}</span>
+                        <div>
+                            <span>Date: {{ event.date }}</span><br>
+                            <span>Lieu: {{ event.lieu }}</span><br>
+                            <span>Groupe: {{ event.groupe.nom }}</span>
+                        </div>
+                        {% if event.id in participation_status %}
+                            <span class="event-status">J'ai participé</span>
+                        {% else %}
+                            <span class="event-status not-participating">Je n'ai pas participé</span>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var tabList = document.getElementById('tab-list');
+            var tabCalendar = document.getElementById('tab-calendar');
+            var tabHistory = document.getElementById('tab-history');
+            var contentList = document.getElementById('content-list');
+            var contentCalendar = document.getElementById('content-calendar');
+            var contentHistory = document.getElementById('content-history');
+            var calendarEl = document.getElementById('calendar');
+            var calendar;
+
+            tabList.addEventListener('click', function() {
+                tabList.classList.add('active');
+                tabCalendar.classList.remove('active');
+                tabHistory.classList.remove('active');
+                contentList.classList.add('active');
+                contentCalendar.classList.remove('active');
+                contentHistory.classList.remove('active');
+                contentCalendar.style.display = 'none';
+                contentHistory.style.display = 'none';
+                contentList.style.display = 'block';
+            });
+
+            tabCalendar.addEventListener('click', function() {
+                tabCalendar.classList.add('active');
+                tabList.classList.remove('active');
+                tabHistory.classList.remove('active');
+                contentCalendar.classList.add('active');
+                contentList.classList.remove('active');
+                contentHistory.classList.remove('active');
+                contentList.style.display = 'none';
+                contentHistory.style.display = 'none';
+                contentCalendar.style.display = 'block';
+
+                // Initialiser le calendrier lorsque le conteneur est visible
+                if (!calendar) {
+                    // Fetch events from the Django context
+                    var userEvents = JSON.parse('{{ user_events|escapejs }}');
+
+                    calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth',
+                        locale: 'fr', // pour mettre le calendrier en français
+                        displayEventTime: false, // Masquer l'heure des événements
+                        events: userEvents.map(event => ({
+                            title: event.nom,
+                            start: event.date,
+                            end: event.date,
+                            extendedProps: {
+                                lieu: event.lieu,
+                                groupe: event.groupe
+                            }
+                        }))
+                    });
+                    calendar.render();
+                }
+            });
+
+            tabHistory.addEventListener('click', function() {
+                tabHistory.classList.add('active');
+                tabList.classList.remove('active');
+                tabCalendar.classList.remove('active');
+                contentHistory.classList.add('active');
+                contentList.classList.remove('active');
+                contentCalendar.classList.remove('active');
+                contentList.style.display = 'none';
+                contentCalendar.style.display = 'none';
+                contentHistory.style.display = 'block';
+            });
+
+            // Initialize Leaflet maps
+            const events = [
+                {% for event in all_events %}
+                    {
+                        id: {{ forloop.counter }},
+                        location: "{{ event.lieu }}"
+                    },
+                {% endfor %}
+            ];
+
+            function getLatLon(location, callback) {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            callback([data[0].lat, data[0].lon]);
+                        } else {
+                            console.error('Location not found:', location);
+                        }
+                    });
+            }
+
+            function processQueue(queue, callback, delay) {
+                let index = 0;
+                function next() {
+                    if (index < queue.length) {
+                        callback(queue[index], function() {
+                            index++;
+                            setTimeout(next, delay);
+                        });
+                    }
+                }
+                next();
+            }
+
+            processQueue(events, function(event, done) {
+                getLatLon(event.location, function(latlon) {
+                    const map = L.map('map-' + event.id).setView(latlon, 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+
+                    L.marker(latlon).addTo(map)
+                        .bindPopup(event.location)
+                        .openPopup();
+
+                    done();
+                });
+            }, 1000); // Ajouter un délai de 1 seconde entre les requêtes
+
+            // Fonction pour créer un fichier iCal
+            function createICalFile(events) {
+                let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Votre Nom ou Société//Votre Application//FR
+CALSCALE:GREGORIAN`;
+
+                events.forEach(event => {
+                    icsContent += `
+BEGIN:VEVENT
+SUMMARY:${event.nom}
+DTSTART:${event.date.replace(/-/g, '')}
+DTEND:${event.date.replace(/-/g, '')}
+LOCATION:${event.lieu}
+END:VEVENT`;
+                });
+
+                icsContent += `
+END:VCALENDAR`;
+
+                const blob = new Blob([icsContent], { type: 'text/calendar' });
+                return URL.createObjectURL(blob);
+            }
+
+            // Bouton pour exporter vers iCal
+            document.getElementById('export-ical').addEventListener('click', function() {
+                const userEvents = JSON.parse('{{ user_events|escapejs }}');
+                const icsUrl = createICalFile(userEvents);
+                const a = document.createElement('a');
+                a.href = icsUrl;
+                a.download = 'mes_evenements.ics';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+        });
+    </script>
+{% endblock %}

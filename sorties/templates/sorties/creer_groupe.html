@@ -1,0 +1,338 @@
+{% extends "sorties/base.html" %}
+
+{% block title %}Créer un Groupe{% endblock %}
+
+{% block content %}
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        position: relative;
+    }
+
+    .header h1 {
+        font-size: 2.5em;
+        font-weight: bold;
+    }
+
+    .return-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background-color: white;
+        color: #345c33;
+        padding: 0.5em 1em;
+        border-radius: 5px;
+        font-size: 0.9em;
+        transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+        border: 2px solid #345c33;
+        text-decoration: none;
+    }
+
+    .return-button:hover {
+        background-color: #345c33;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+    }
+
+    .form-buttons {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .form-buttons .button {
+        background-color: #345c33;
+        color: white;
+        padding: 0.5em 1em;
+        border-radius: 5px;
+        font-size: 1em;
+        transition: background-color 0.3s, box-shadow 0.3s;
+        border: none;
+    }
+
+    .form-buttons .button:hover {
+        background-color: #2a472a;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .friends-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-top: 20px;
+        position: relative;
+    }
+
+    .friends-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .friend-item {
+        text-align: center;
+        width: 100px;
+        cursor: pointer;
+    }
+
+    .friend-item img {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ddd;
+        transition: border-color 0.3s;
+    }
+    .friend-item img:hover {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #345c33;
+        transition: border-color 0.3s;
+    }
+
+    .friend-item img.selected {
+        border-color: #345c33;
+        border: 4px solid #345c33;
+    }
+
+    .friend-item label {
+        display: block;
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+
+    .friend-item input[type="checkbox"] {
+        display: none;
+    }
+
+    .search-bar {
+        margin-bottom: 20px;
+    }
+
+    .search-bar input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+
+    .show-more {
+        display: none;
+    }
+
+    .show-more-btn {
+        background-color: #345c33;
+        color: white;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        right: 0;
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .show-more-btn:hover {
+        background-color: #2a472a;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    @media (max-width: 768px) {
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .return-button {
+            position: static;
+            margin-top: 10px;
+            padding: 0.5em;
+            font-size: 0.8em;
+        }
+
+        .header h1 {
+            font-size: 2em;
+        }
+
+        .form-buttons .button {
+            padding: 0.4em 0.8em;
+            font-size: 0.9em;
+        }
+    }
+
+    fieldset {
+        margin-bottom: 30px;
+        border: none;
+    }
+
+    legend {
+        font-size: 1.4em;
+        margin-bottom: 10px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    label.light {
+        font-weight: 300;
+        display: inline;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="date"],
+    input[type="datetime"],
+    input[type="email"],
+    input[type="number"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="time"],
+    input[type="url"],
+    textarea,
+    select {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        font-size: 16px;
+        height: auto;
+        margin: 0;
+        outline: 0;
+        padding: 15px;
+        width: 100%;
+        background-color: #e8eeef;
+        color: #8a97a0;
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03) inset;
+        margin-bottom: 30px;
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+        margin: 0 4px 8px 0;
+    }
+
+    select {
+        padding: 6px;
+        height: 32px;
+        border-radius: 2px;
+    }
+</style>
+
+<div class="container">
+    <div class="header">
+        <h1>Créer un Groupe</h1>
+        <a href="{% url 'liste_groupes' %}" class="return-button">&larr; Retour à la liste des groupes</a>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.nom.label_tag }}
+            {{ form.nom }}
+        </div>
+        <div class="mb-3">
+            <label for="friends-search">Amis</label>
+            <div class="search-bar">
+                <input type="text" id="friends-search" placeholder="Rechercher des amis..." onkeyup="filterFriends()">
+            </div>
+            <div class="friends-container">
+                <div class="friends-list" id="friends-list">
+                    {% for friend in form.membres.field.queryset %}
+                        <div class="friend-item{% if forloop.counter > 8 %} show-more{% endif %}" onclick="toggleSelection(this)">
+                            <input type="checkbox" id="friend-{{ friend.id }}" name="membres" value="{{ friend.id }}">
+                            <label for="friend-{{ friend.id }}">
+                                {% if friend.profile.photo %}
+                                    <img src="{{ friend.profile.photo.url }}" alt="{{ friend.username }}">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/70" alt="{{ friend.username }}">
+                                {% endif %}
+                                {{ friend.username }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div id="show-more-btn" class="show-more-btn" onclick="toggleShowMore()">...</div>
+            </div>
+        </div>
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary button">Créer</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function toggleSelection(element) {
+        const checkbox = element.querySelector('input[type="checkbox"]');
+        const img = element.querySelector('img');
+        
+        checkbox.checked = !checkbox.checked;
+        if (checkbox.checked) {
+            img.classList.add('selected');
+        } else {
+            img.classList.remove('selected');
+        }
+    }
+
+    function filterFriends() {
+        const searchInput = document.getElementById('friends-search').value.toLowerCase();
+        const friendsList = document.getElementById('friends-list');
+        const friends = friendsList.getElementsByClassName('friend-item');
+
+        for (let i = 0; i < friends.length; i++) {
+            const friend = friends[i];
+            const username = friend.textContent || friend.innerText;
+
+            if (username.toLowerCase().indexOf(searchInput) > -1) {
+                friend.style.display = "";
+            } else {
+                friend.style.display = "none";
+            }
+        }
+
+        // Réinitialiser le bouton "Voir plus" en cas de recherche
+        const showMoreBtn = document.getElementById('show-more-btn');
+        showMoreBtn.textContent = '...';
+        for (let i = 0; i < friends.length; i++) {
+            if (friends[i].classList.contains('show-more')) {
+                friends[i].style.display = 'none';
+            }
+        }
+    }
+
+    function toggleShowMore() {
+        const showMoreItems = document.getElementsByClassName('show-more');
+        const showMoreBtn = document.getElementById('show-more-btn');
+        for (let i = 0; i < showMoreItems.length; i++) {
+            if (showMoreItems[i].style.display === 'none' || showMoreItems[i].style.display === '') {
+                showMoreItems[i].style.display = 'block';
+            } else {
+                showMoreItems[i].style.display = 'none';
+            }
+        }
+        showMoreBtn.textContent = showMoreBtn.textContent === '...' ? 'Voir moins...' : '...';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const showMoreItems = document.getElementsByClassName('show-more');
+        if (showMoreItems.length > 0) {
+            for (let i = 0; i < showMoreItems.length; i++) {
+                showMoreItems[i].style.display = 'none';
+            }
+            document.getElementById('show-more-btn').style.display = 'block';
+        } else {
+            document.getElementById('show-more-btn').style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% block content %}
+{% load static %}
+{% load account %}
+{% load socialaccount %}
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        display: flex;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+    
+    .container {
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+    
+    .left {
+        background: url('{% static "./images/imageaccueil.gif" %}') no-repeat center center;
+        background-size: cover;
+        width: 60%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .right {
+        width: 40%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #ffffff;
+        color: #000000;
+        padding: 20px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+    
+    .right h1 {
+        font-size: 3em;
+        margin-bottom: 0.5em;
+    }
+    
+    .right p {
+        font-size: 1.5em;
+        margin-bottom: 2em;
+    }
+    
+    .button {
+        width: 80%;
+        max-width: 300px;
+        padding: 15px;
+        border: none;
+        border-radius: 5px;
+        margin: 10px 0;
+        cursor: pointer;
+        font-size: 1em;
+        box-sizing: border-box;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        color: white;
+    }
+    
+    .button-google {
+        background-color: #fff;
+        color: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .button-apple {
+        background-color: #fff;
+        color: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .button-create {
+        background-color: #345c33;
+        color: #fff !important;
+    }
+    
+    .right a {
+        color: #345c33;
+        text-decoration: none;
+        margin-top: 20px;
+    }
+    
+    .right .separator {
+        width: 80%;
+        max-width: 300px;
+        height: 1px;
+        background-color: #ccc;
+        margin: 20px 0;
+    }
+
+    .button-google {
+        background-color: #fff;
+        color: #000;
+        border: 1px solid #ccc; /* Light gray border */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+        transition: all 0.3s;
+    }
+
+    .button-google:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Slightly larger shadow on hover */
+        background-color: #f8f8f8; /* Slight gray background on hover */
+    }
+
+    
+    @media (max-width: 1024px) {
+        .container {
+            flex-direction: column;
+            align-items: center;
+        }
+        .left {
+            width: 100%;
+            height: 200px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin-bottom: 20px;
+        }
+        .right {
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+        }
+        .right h1 {
+            font-size: 2em;
+        }
+        .right p {
+            font-size: 1.2em;
+        }
+        .button {
+            width: calc(100% - 40px);
+            max-width: none;
+            padding: 10px;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="left"></div>
+    <div class="right">
+        <h1>Viens faire la <a>fête</a></h1>
+        <p>On s'occupe de tout</p>
+        <a href="{% provider_login_url 'google' %}" class="button button-google">
+            <img src="{% static 'images/google_logo.png' %}" alt="Google logo" style="height: 24px; margin-right: 10px;">
+            S'inscrire avec Google
+        </a>
+        <div class="separator"></div>
+        <a class="button button-create" href="{% url 'register' %}">Créez votre compte</a>
+        <p>Vous avez déjà un compte ? <a href="{% url 'login' %}">Connectez-vous</a></p>
+    </div>
+</div>
+{% endblock %}

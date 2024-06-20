@@ -1,0 +1,114 @@
+{% extends "sorties/base.html" %}
+
+{% block title %}Recherche d'utilisateurs{% endblock %}
+
+{% block content %}
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
+<style>
+    .search-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .search-header h2 {
+        font-size: 2.5em;
+        font-weight: bold;
+    }
+
+    .search-form {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+    }
+
+    .search-form .form-control {
+        max-width: 500px;
+        border-radius: 20px;
+    }
+
+    .search-form .btn {
+        background-color: #345c33;
+        color: white;
+        border-radius: 20px;
+        padding: 10px 20px;
+        font-size: 1.2em;
+        transition: background-color 0.3s, box-shadow 0.3s;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-form .btn i {
+        margin-right: 5px;
+    }
+
+    .search-form .btn:hover {
+        background-color: #2a472a;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .user-list {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 0;
+    }
+
+    .user-list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        transition: box-shadow 0.3s;
+    }
+
+    .user-list-item:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-list-item .username {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    .user-list-item .btn {
+        background-color: #6c757d;
+        color: white;
+        border-radius: 20px;
+        padding: 10px 20px;
+        font-size: 1em;
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .user-list-item .btn:hover {
+        background-color: #5a6268;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="search-header">
+        <h2>Recherche d'utilisateurs</h2>
+    </div>
+
+    <div class="search-form">
+        <form method="get" action="{% url 'search_users' %}" class="d-flex w-100 justify-content-center">
+            <input type="text" name="q" class="form-control" placeholder="Rechercher des utilisateurs">
+            <button type="submit" class="btn btn-primary ml-2"><i class="fas fa-search"></i> </button>
+        </form>
+    </div>
+
+    <ul class="user-list">
+        {% for user in users %}
+            <li class="user-list-item">
+                <span class="username">{{ user.username }}</span>
+                <a href="{% url 'send_friend_request' user.id %}" class="btn btn-secondary">Envoyer une demande d'ami</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

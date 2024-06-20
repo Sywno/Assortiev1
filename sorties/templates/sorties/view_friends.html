@@ -1,0 +1,219 @@
+{% extends "sorties/base.html" %}
+
+{% block title %}Liste des Amis{% endblock %}
+
+{% block content %}
+    <style>
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            padding: 10px 20px;
+            flex: 1;
+            font-weight: bold;
+            border-bottom: 2px solid transparent;
+            position: relative; /* Pour positionner le badge */
+        }
+
+        .tab:hover {
+            color: #345c33;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid #345c33;
+            color: #345c33;
+        }
+
+        .tab .badge {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+
+        .tab-content {
+            display: none;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .list-group {
+            padding: 0;
+            list-style: none;
+        }
+
+        .list-group-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            transition: background-color 0.3s;
+        }
+
+        .list-group-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .list-group-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .list-group-item .username {
+            font-size: 1.2em;
+            font-weight: bold;
+            flex-grow: 1;
+        }
+
+        .list-group-item .actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .list-group-item .actions svg {
+            margin-left: 10px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .list-group-item .actions svg:hover {
+            color: #345c33;
+        }
+
+        .list-group-item .actions .plus-icon {
+            fill: #000; /* Assure que l'icône "plus" soit en noir */
+        }
+
+        .remove-friend {
+            color: red;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+
+    <div class="tabs">
+        <div class="tab active" id="tab-friends">Amis</div>
+        <div class="tab" id="tab-requests">En attente
+            {% if pending_requests_count > 0 %}
+                <span class="badge">{{ pending_requests_count }}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="content-friends" class="tab-content active">
+        <h2>Mes amis</h2>
+        <ul class="list-group">
+            {% for friend in friends %}
+                <li class="list-group-item">
+                    {% if friend.photo %}
+                        <img src="{{ friend.photo.url }}" alt="Avatar">
+                    {% else %}
+                        <img src="https://via.placeholder.com/40" alt="Avatar">
+                    {% endif %}
+                    <span class="username">{{ friend.user.username }}</span>
+                    <span class="remove-friend" data-friend-id="{{ friend.id }}">✖</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div id="content-requests" class="tab-content">
+        <h2>Demandes d'Ami</h2>
+        <ul class="list-group">
+            {% for request in friend_requests %}
+                <li class="list-group-item">
+                    {% if request.from_user.profile.photo %}
+                        <img src="{{ request.from_user.profile.photo.url }}" alt="Avatar">
+                    {% else %}
+                        <img src="https://via.placeholder.com/40" alt="Avatar">
+                    {% endif %}
+                    <span class="username">{{ request.from_user.username }}</span>
+                    <div class="actions">
+                        <!-- Formulaire pour accepter la demande d'ami -->
+                        <form method="post" action="{% url 'accept_friend_request' request.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="border: none; background: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5 13H7a1 1 0 0 1 0-2h10a1 1 0 0 1 0 2z"/></svg>
+                            </button>
+                        </form>
+
+                        <!-- Formulaire pour refuser la demande d'ami -->
+                        <form method="post" action="{% url 'reject_friend_request' request.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="border: none; background: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var tabFriends = document.getElementById('tab-friends');
+            var tabRequests = document.getElementById('tab-requests');
+            var contentFriends = document.getElementById('content-friends');
+            var contentRequests = document.getElementById('content-requests');
+
+            tabFriends.addEventListener('click', function() {
+                tabFriends.classList.add('active');
+                tabRequests.classList.remove('active');
+                contentFriends.classList.add('active');
+                contentRequests.classList.remove('active');
+            });
+
+            tabRequests.addEventListener('click', function() {
+                tabRequests.classList.add('active');
+                tabFriends.classList.remove('active');
+                contentRequests.classList.add('active');
+                contentFriends.classList.remove('active');
+            });
+
+            const removeButtons = document.querySelectorAll('.remove-friend');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const friendId = this.getAttribute('data-friend-id');
+                    const confirmation = confirm('Êtes-vous sûr de vouloir supprimer cet ami ?');
+                    if (confirmation) {
+                        fetch(`/sorties/remove_friend/${friendId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            }
+                        }).then(response => {
+                            if (response.ok) {
+                                window.location.reload();
+                            } else {
+                                alert('Une erreur est survenue.');
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
