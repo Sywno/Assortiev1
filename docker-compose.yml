@@ -10,3 +10,15 @@ services:
       - "8000:8000"
     env_file:
       - envi.env
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.landing-page.entrypoints=web,websecure'
+      - 'traefik.http.routers.landing-page.rule=Host(`api.louislecouturier.fr`)'
+      - 'traefik.http.routers.landing-page.tls=true'
+      - 'traefik.http.routers.landing-page.tls.certresolver=production'
+    networks:
+      - 'traefik_default'
+
+networks:
+  traefik_default:
+    external: true

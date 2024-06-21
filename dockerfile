@@ -12,6 +12,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY envi.env /app/envi.env
 RUN export $(cat /app/envi.env | xargs)
 
+
+EXPOSE 8000
+
 RUN python manage.py collectstatic --noinput
 RUN python manage.py migrate
 
